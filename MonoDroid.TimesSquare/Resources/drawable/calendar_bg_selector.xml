@@ -18,9 +18,9 @@
   <item app:state_highlighted="true">
     <color android:color="@color/calendar_highlighted_day_bg"/>
   </item>
-  <item app:state_today="true">
+<!--  <item app:state_today="true">
     <color android:color="@color/calendar_text_active"/>
-  </item>
+  </item>-->
   <item>
     <color android:color="@color/calendar_active_month_bg"/>
   </item>

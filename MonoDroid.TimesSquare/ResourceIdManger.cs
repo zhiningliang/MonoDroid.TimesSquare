@@ -24,8 +24,9 @@ namespace MonoDroid.TimesSquare
             var t = f(eass);
             if (t == null)
                 t = AppDomain.CurrentDomain.GetAssemblies().Select(ass => f(ass)).Where(ty => ty != null).FirstOrDefault();
-            if (t != null)
-                t.GetMethod("UpdateIdValues").Invoke(null, new object[0]);
+			if (t != null && t.GetMethod ("UpdateIdValues") != null) {
+				t.GetMethod ("UpdateIdValues").Invoke (null, new object[0]); 
+			} 
             id_initialized = true;
         }
     }

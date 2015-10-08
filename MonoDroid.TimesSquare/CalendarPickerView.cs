@@ -8,6 +8,7 @@ using Android.Content;
 using Android.Util;
 using Android.Widget;
 using Java.Lang;
+using Android.Content.Res;
 
 namespace MonoDroid.TimesSquare
 {
@@ -30,6 +31,7 @@ namespace MonoDroid.TimesSquare
         internal List<MonthCellDescriptor> SelectedCells = new List<MonthCellDescriptor>();
         private readonly List<MonthCellDescriptor> _highlightedCells = new List<MonthCellDescriptor>();
         internal List<DateTime> SelectedCals = new List<DateTime>();
+		List<DateTime> HighlightedDates = new List<DateTime>();
         private readonly List<DateTime> _highlightedCals = new List<DateTime>();
         internal readonly DateTime Today = DateTime.Now;
         internal DateTime MinDate;
@@ -40,6 +42,7 @@ namespace MonoDroid.TimesSquare
         internal int DayTextColorResID;
         internal int TitleTextColor;
         internal int HeaderTextColor;
+		internal string InvalidDateErrorMessage;
 
         internal readonly string MonthNameFormat;
         internal readonly string WeekdayNameFormat;
@@ -113,7 +116,8 @@ namespace MonoDroid.TimesSquare
         {
             var clickedDate = cell.DateTime;
 
-            if (!IsBetweenDates(clickedDate, MinDate, MaxDate) || !IsSelectable(clickedDate)) {
+			if (!IsBetweenDates(clickedDate, MinDate, MaxDate) || !IsSelectable(clickedDate) 
+				|| HighlightedDates.Contains(clickedDate.Date)) {
                 if (OnInvalidDateSelected != null) {
                     OnInvalidDateSelected(this, new DateSelectedEventArgs(clickedDate));
                 }
@@ -134,10 +138,13 @@ namespace MonoDroid.TimesSquare
         private void OnInvalidateDateClicked(object sender, DateSelectedEventArgs e)
         {
             string fullDateFormat = _context.Resources.GetString(Resource.String.full_date_format);
-            string errorMsg = _context.Resources.GetString(Resource.String.invalid_date);
+			string errorMsg = InvalidDateErrorMessage ?? _context.Resources.GetString(Resource.String.invalid_date);
             errorMsg = string.Format(errorMsg, MinDate.ToString(fullDateFormat),
                 MaxDate.ToString(fullDateFormat));
-            Toast.MakeText(_context, errorMsg, ToastLength.Short).Show();
+
+			if (!string.IsNullOrEmpty (errorMsg)) {
+				Toast.MakeText (_context, InvalidDateErrorMessage ?? errorMsg, ToastLength.Short).Show ();
+			}
         }
 
         public FluentInitializer Init(DateTime minDate, DateTime maxDate)
@@ -416,7 +423,7 @@ namespace MonoDroid.TimesSquare
             if (date == DateTime.MinValue) {
                 throw new IllegalArgumentException("Selected date must be non-zero.");
             }
-            if (date.CompareTo(MinDate) < 0 || date.CompareTo(MaxDate) > 0) {
+			if (date.CompareTo(MinDate) < 0 || date.CompareTo(MaxDate) > 0) {
                 throw new IllegalArgumentException(
                     string.Format("Selected date must be between minDate and maxDate. "
                                   + "minDate: {0}, maxDate: {1}, selectedDate: {2}.",
@@ -467,6 +474,8 @@ namespace MonoDroid.TimesSquare
 
         public void HighlightDates(ICollection<DateTime> dates)
         {
+			HighlightedDates.Clear();
+			HighlightedDates.AddRange (dates);
             foreach (var date in dates) {
                 ValidateDate(date);
 
@@ -483,7 +492,7 @@ namespace MonoDroid.TimesSquare
             Adapter = MyAdapter;
         }
 
-        private static string Debug(DateTime minDate, DateTime maxDate)
+		private static string Debug(DateTime minDate, DateTime maxDate)
         {
             return "minDate: " + minDate + "\nmaxDate: " + maxDate;
         }
@@ -575,6 +584,13 @@ namespace MonoDroid.TimesSquare
         {
             return WithHighlightedDates(new List<DateTime> {date});
         }
+
+		public FluentInitializer WithInvalidDateErrorMessage(string error)
+		{
+			_calendar.InvalidDateErrorMessage = error;
+			return this;
+		}
+			
     }
 
     public delegate void ClickHandler(MonthCellDescriptor cell);

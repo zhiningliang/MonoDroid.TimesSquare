@@ -11,7 +11,7 @@ namespace MonoDroid.TimesSquare
     {
         private static readonly int[] StateSelectable = {Resource.Attribute.state_selectable};
         private static readonly int[] StateCurrentMonth = {Resource.Attribute.state_current_month};
-        private static readonly int[] StateToday = {Resource.Attribute.state_today};
+//        private static readonly int[] StateToday = {Resource.Attribute.state_today};
         private static readonly int[] StateHighlighted = {Resource.Attribute.state_highlighted};
         private static readonly int[] StateRangeFirst = {Resource.Attribute.state_range_first};
         private static readonly int[] StateRangeMiddle = {Resource.Attribute.state_range_middle};
@@ -97,9 +97,9 @@ namespace MonoDroid.TimesSquare
                 MergeDrawableStates(drawableState, StateCurrentMonth);
             }
 
-            if (_isToday) {
-                MergeDrawableStates(drawableState, StateToday);
-            }
+//            if (_isToday) {
+//                MergeDrawableStates(drawableState, StateToday);
+//            }
 
             if (_isHighlighted)
             {
